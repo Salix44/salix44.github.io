@@ -1,0 +1,90 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import type { BlogPost } from "../lib/blog";
+import BaseLayout from "./BaseLayout.astro";
+import { formatDate } from "../lib/blog";
+import { withBase } from "../lib/url";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  post: BlogPost;
+  headings: Heading[];
+}
+
+const { post, headings } = Astro.props;
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const localImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../content/blog/**/*.{png,jpg,jpeg,webp,avif,gif}",
+  { eager: true }
+);
+const sourcePath =
+  "filePath" in post && typeof post.filePath === "string"
+    ? post.filePath.replace(/\\/g, "/")
+    : `src/content/blog/${post.id}.md`;
+const postDirectory = sourcePath
+  .replace(/^src\/content\/blog\//, "")
+  .split("/")
+  .slice(0, -1)
+  .join("/");
+const relativeHero = post.data.hero?.startsWith("./")
+  ? post.data.hero.replace(/^\.\//, "")
+  : undefined;
+const localHeroEntry = relativeHero
+  ? Object.entries(localImages).find(
+      ([path]) =>
+        path.endsWith(`/${post.id}/${relativeHero}`) ||
+        path.endsWith(`/${postDirectory}/${relativeHero}`)
+    )
+  : undefined;
+const localHero = localHeroEntry?.[1].default;
+const publicHero = post.data.hero?.startsWith("/") ? post.data.hero : undefined;
+---
+
+<BaseLayout title={post.data.title} description={post.data.description} ogImage={publicHero}>
+  <article class="post-detail">
+    <header class="post-hero container">
+      <a class="back-link" href={withBase("/posts/")}>글 목록</a>
+      <div class="post-hero__meta">
+        <span>{post.data.category}</span>
+        <time datetime={post.data.publishDate.toISOString()}>{formatDate(post.data.publishDate)}</time>
+      </div>
+      <h1>{post.data.title}</h1>
+      <p>{post.data.description}</p>
+      <ul class="tag-list tag-list--large" aria-label="태그">
+        {post.data.tags.map((tag) => <li><a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}</a></li>)}
+      </ul>
+      {
+        localHero ? (
+          <Image src={localHero} alt="" loading="eager" />
+        ) : (
+          publicHero && <img src={withBase(publicHero)} alt="" loading="eager" />
+        )
+      }
+    </header>
+    <div class="container post-shell">
+      {
+        tocHeadings.length > 0 && (
+          <aside class="toc" aria-label="목차">
+            <strong>목차</strong>
+            <nav>
+              {tocHeadings.map((heading) => (
+                <a class={`toc__link toc__link--depth-${heading.depth}`} href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )
+      }
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getSortedPosts, getTagCounts } from "../../lib/blog";
+import { withBase } from "../../lib/url";
+
+const posts = getSortedPosts(await getCollection("blog"));
+const tagCounts = getTagCounts(posts);
+---
+
+<BaseLayout title="태그" description="블로그 글을 태그별로 탐색합니다.">
+  <section class="container page-head">
+    <p class="eyebrow">Tags</p>
+    <h1>태그</h1>
+    <p>관심 주제를 기준으로 개발 노트, 게임 글, 자료를 묶어 봅니다.</p>
+  </section>
+  <section class="container section section--compact">
+    <ul class="tag-cloud tag-cloud--large" aria-label="전체 태그">
+      {tagCounts.map(([tag, count]) => <li><a href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>{tag}<span>{count}</span></a></li>)}
+    </ul>
+  </section>
+</BaseLayout>

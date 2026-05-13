@@ -1,0 +1,21 @@
+---
+import { getCollection } from "astro:content";
+import PostCard from "../../components/PostCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getSortedPosts } from "../../lib/blog";
+
+const posts = getSortedPosts(await getCollection("blog"));
+---
+
+<BaseLayout title="전체 글" description="개발, 게임, 자료 카테고리의 모든 글">
+  <section class="container page-head">
+    <p class="eyebrow">Archive</p>
+    <h1>전체 글</h1>
+    <p>최근에 정리한 글을 모아둡니다.</p>
+  </section>
+  <section class="container section">
+    <div class="post-grid post-grid--list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</BaseLayout>

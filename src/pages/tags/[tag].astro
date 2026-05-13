@@ -1,0 +1,33 @@
+---
+import { getCollection } from "astro:content";
+import PostCard from "../../components/PostCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getSortedPosts, getTagCounts } from "../../lib/blog";
+
+export async function getStaticPaths() {
+  const posts = getSortedPosts(await getCollection("blog"));
+
+  return getTagCounts(posts).map(([tag]) => ({
+    params: { tag },
+    props: { tag }
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = getSortedPosts(await getCollection("blog")).filter((post) =>
+  post.data.tags.includes(tag)
+);
+---
+
+<BaseLayout title={`#${tag}`} description={`#${tag} 태그가 붙은 글 모음`}>
+  <section class="container page-head">
+    <p class="eyebrow">Tag</p>
+    <h1>#{tag}</h1>
+    <p>{posts.length}개의 글이 있습니다.</p>
+  </section>
+  <section class="container section">
+    <div class="post-grid post-grid--list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</BaseLayout>
