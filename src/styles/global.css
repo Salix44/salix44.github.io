@@ -430,6 +430,14 @@ h3 {
   padding-block: 1rem 5rem;
 }
 
+.post-shell--single {
+  grid-template-columns: minmax(0, 44rem);
+}
+
+.post-content {
+  min-width: 0;
+}
+
 .toc {
   position: sticky;
   top: calc(var(--header-height) + 1rem);
@@ -460,6 +468,27 @@ h3 {
 
 .prose {
   min-width: 0;
+}
+
+.comments {
+  margin-top: 3rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.75rem;
+}
+
+.comments__head {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.comments h2 {
+  font-size: 1.35rem;
+}
+
+.comments--empty p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 .prose p:has(> img:only-child) {

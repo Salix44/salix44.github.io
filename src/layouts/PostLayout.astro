@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import type { BlogPost } from "../lib/blog";
 import BaseLayout from "./BaseLayout.astro";
+import CusdisComments from "../components/CusdisComments.astro";
 import { formatDate } from "../lib/blog";
 import { withBase } from "../lib/url";
 
@@ -67,7 +68,7 @@ const publicHero = post.data.hero?.startsWith("/") ? post.data.hero : undefined;
         )
       }
     </header>
-    <div class="container post-shell">
+    <div class:list={["container", "post-shell", tocHeadings.length === 0 && "post-shell--single"]}>
       {
         tocHeadings.length > 0 && (
           <aside class="toc" aria-label="목차">
@@ -82,8 +83,11 @@ const publicHero = post.data.hero?.startsWith("/") ? post.data.hero : undefined;
           </aside>
         )
       }
-      <div class="prose">
-        <slot />
+      <div class="post-content">
+        <div class="prose">
+          <slot />
+        </div>
+        <CusdisComments post={post} />
       </div>
     </div>
   </article>

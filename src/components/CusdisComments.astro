@@ -1,0 +1,30 @@
+---
+import type { BlogPost } from "../lib/blog";
+import { postPath, postSlug } from "../lib/blog";
+import { absoluteUrl } from "../lib/url";
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const appId = import.meta.env.PUBLIC_CUSDIS_APP_ID || "df9501ab-09fb-4a85-91c7-83a9ebf91896";
+const host = import.meta.env.PUBLIC_CUSDIS_HOST || "https://cusdis.com";
+const pageId = postSlug(post);
+const pageUrl = absoluteUrl(postPath(post), Astro.site);
+---
+
+<section class="comments" aria-labelledby="comments-title">
+  <div class="comments__head">
+    <h2 id="comments-title">댓글</h2>
+  </div>
+  <div
+    id="cusdis_thread"
+    data-host={host}
+    data-app-id={appId}
+    data-page-id={pageId}
+    data-page-url={pageUrl}
+    data-page-title={post.data.title}
+  />
+  <script is:inline async defer src={`${host}/js/cusdis.es.js`}></script>
+</section>
