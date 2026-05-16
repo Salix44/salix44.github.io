@@ -14,7 +14,8 @@ const blog = defineCollection({
     category: z.enum(["개발", "게임", "자료"]),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
-    hero: z.string().optional()
+    hero: z.string().optional(),
+    heroAlt: z.string().optional()
   })
 });
 

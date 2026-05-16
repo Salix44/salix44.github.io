@@ -471,19 +471,48 @@ h3 {
 }
 
 .comments {
-  margin-top: 3rem;
-  border-top: 1px solid var(--line);
-  padding-top: 1.75rem;
+  margin-top: 3.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 247, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 253, 247, 0.86);
+  padding: 1rem 1.15rem 1.15rem;
 }
 
 .comments__head {
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
   margin-bottom: 1rem;
+  padding-bottom: 0.7rem;
 }
 
 .comments h2 {
-  font-size: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  color: var(--bg-strong);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.comments__body {
+  overflow: visible;
+  background: transparent;
+}
+
+.comments__body iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color-scheme: light;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+
+.comments__body iframe::-webkit-scrollbar {
+  display: none;
 }
 
 .comments--empty p {
@@ -696,5 +725,10 @@ h3 {
   .site-footer__inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .comments {
+    margin-inline: 0;
+    padding: 0.9rem;
   }
 }

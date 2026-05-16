@@ -16,15 +16,76 @@ const pageUrl = absoluteUrl(postPath(post), Astro.site);
 
 <section class="comments" aria-labelledby="comments-title">
   <div class="comments__head">
-    <h2 id="comments-title">댓글</h2>
+    <h2 id="comments-title">Comments</h2>
   </div>
-  <div
-    id="cusdis_thread"
-    data-host={host}
-    data-app-id={appId}
-    data-page-id={pageId}
-    data-page-url={pageUrl}
-    data-page-title={post.data.title}
-  />
+  <div class="comments__body">
+    <div
+      id="cusdis_thread"
+      data-host={host}
+      data-app-id={appId}
+      data-page-id={pageId}
+      data-page-url={pageUrl}
+      data-page-title={post.data.title}
+      data-theme="light"
+    />
+  </div>
   <script is:inline async defer src={`${host}/js/cusdis.es.js`}></script>
+  <script is:inline>
+    (() => {
+      const section = document.currentScript?.closest(".comments");
+      const thread = section?.querySelector("#cusdis_thread");
+      const iframeHeightBuffer = 40;
+      const iframeMinHeight = 360;
+      const setIframeFrame = () => {
+        const iframe = thread?.querySelector("iframe");
+
+        if (!iframe) {
+          return undefined;
+        }
+
+        iframe.setAttribute("scrolling", "no");
+        iframe.style.display = "block";
+        iframe.style.overflow = "hidden";
+        iframe.style.minHeight = `${iframeMinHeight}px`;
+
+        return iframe;
+      };
+
+      const observer = new MutationObserver(setIframeFrame);
+
+      if (thread) {
+        observer.observe(thread, { childList: true, subtree: true });
+      }
+
+      setIframeFrame();
+
+      window.addEventListener("message", (event) => {
+        let message;
+
+        try {
+          message = JSON.parse(event.data);
+        } catch {
+          return;
+        }
+
+        if (message?.from !== "cusdis" || message.event !== "resize") {
+          return;
+        }
+
+        const height = Number(message.data);
+
+        if (!Number.isFinite(height)) {
+          return;
+        }
+
+        requestAnimationFrame(() => {
+          const iframe = setIframeFrame();
+
+          if (iframe) {
+            iframe.style.height = `${Math.max(Math.ceil(height) + iframeHeightBuffer, iframeMinHeight)}px`;
+          }
+        });
+      });
+    })();
+  </script>
 </section>

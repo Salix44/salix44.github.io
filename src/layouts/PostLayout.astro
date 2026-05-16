@@ -4,8 +4,8 @@ import type { ImageMetadata } from "astro";
 import type { BlogPost } from "../lib/blog";
 import BaseLayout from "./BaseLayout.astro";
 import CusdisComments from "../components/CusdisComments.astro";
-import { formatDate } from "../lib/blog";
-import { withBase } from "../lib/url";
+import { formatDate, postPath } from "../lib/blog";
+import { absoluteUrl, withBase } from "../lib/url";
 
 interface Heading {
   depth: number;
@@ -45,9 +45,74 @@ const localHeroEntry = relativeHero
   : undefined;
 const localHero = localHeroEntry?.[1].default;
 const publicHero = post.data.hero?.startsWith("/") ? post.data.hero : undefined;
+const heroImage = localHero?.src ?? publicHero;
+const heroImageUrl = heroImage ? absoluteUrl(heroImage, Astro.site) : undefined;
+const heroAlt = post.data.heroAlt ?? `${post.data.title} 대표 이미지`;
+const postUrl = absoluteUrl(postPath(post), Astro.site);
+const publishedTime = post.data.publishDate.toISOString();
+const modifiedTime = (post.data.updatedDate ?? post.data.publishDate).toISOString();
+const articleStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  url: postUrl,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": postUrl
+  },
+  datePublished: publishedTime,
+  dateModified: modifiedTime,
+  inLanguage: "ko-KR",
+  articleSection: post.data.category,
+  keywords: post.data.tags.join(", "),
+  author: {
+    "@type": "Person",
+    name: "Salix"
+  },
+  publisher: {
+    "@type": "Person",
+    name: "Salix"
+  },
+  image: heroImageUrl ? [heroImageUrl] : undefined
+};
+const breadcrumbStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "홈",
+      item: absoluteUrl("/", Astro.site)
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "글",
+      item: absoluteUrl("/posts/", Astro.site)
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: post.data.title,
+      item: postUrl
+    }
+  ]
+};
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description} ogImage={publicHero}>
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={heroImage}
+  ogType="article"
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  section={post.data.category}
+  tags={post.data.tags}
+  structuredData={[articleStructuredData, breadcrumbStructuredData]}
+>
   <article class="post-detail">
     <header class="post-hero container">
       <a class="back-link" href={withBase("/posts/")}>글 목록</a>
@@ -62,9 +127,9 @@ const publicHero = post.data.hero?.startsWith("/") ? post.data.hero : undefined;
       </ul>
       {
         localHero ? (
-          <Image src={localHero} alt="" loading="eager" />
+          <Image src={localHero} alt={heroAlt} loading="eager" />
         ) : (
-          publicHero && <img src={withBase(publicHero)} alt="" loading="eager" />
+          publicHero && <img src={withBase(publicHero)} alt={heroAlt} loading="eager" />
         )
       }
     </header>

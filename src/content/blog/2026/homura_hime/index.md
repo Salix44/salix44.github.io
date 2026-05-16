@@ -6,6 +6,7 @@ publishDate: 2026-05-13
 category: "게임"
 tags: ["게임", "Steam", "한글화", "모드"]
 hero: "./images/hime_baner.png"
+heroAlt: "호무라 히메(Homura Hime) 게임 배너 이미지"
 draft: false
 ---
 
